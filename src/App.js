@@ -15,6 +15,10 @@ function App() {
     dispatch(auto().setMarca("Fiat"));
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(auto().save("1234"));
+  }, [dispatch]);
+
   return <div>hola mundo!</div>;
 }
 

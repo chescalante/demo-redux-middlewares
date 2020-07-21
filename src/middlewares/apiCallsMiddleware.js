@@ -1,17 +1,17 @@
 const apiCallsMiddleware = ({ dispatch, getState }) => (next) => (action) => {
-  const { types, callAPI, shouldCallAPI = () => true, payload = {} } = action;
+  const {
+    type,
+    callAPI,
+    shouldCallAPI = () => true,
+    payload = {},
+    inited,
+    completed,
+    failed,
+  } = action;
 
-  if (!types) {
+  if (!callAPI) {
     // Normal action: pass it on
     return next(action);
-  }
-
-  if (
-    !Array.isArray(types) ||
-    types.length !== 3 ||
-    !types.every((type) => typeof type === "string")
-  ) {
-    throw new Error("Expected an array of three string types.");
   }
 
   if (typeof callAPI !== "function") {
@@ -22,11 +22,14 @@ const apiCallsMiddleware = ({ dispatch, getState }) => (next) => (action) => {
     return;
   }
 
-  const [requestType, successType, failureType] = types;
+  const initedType = `${type}/inited`;
+  const completedType = `${type}/completed`;
+  const failedType = `${type}/failed`;
 
   dispatch(
     Object.assign({}, payload, {
-      type: requestType,
+      type: initedType,
+      inited,
     })
   );
 
@@ -35,14 +38,16 @@ const apiCallsMiddleware = ({ dispatch, getState }) => (next) => (action) => {
       dispatch(
         Object.assign({}, payload, {
           response,
-          type: successType,
+          type: completedType,
+          completed,
         })
       ),
     (error) =>
       dispatch(
         Object.assign({}, payload, {
           error,
-          type: failureType,
+          type: failedType,
+          failed,
         })
       )
   );

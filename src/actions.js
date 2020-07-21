@@ -44,6 +44,24 @@ const auto = () => {
         return { ...state, modelo: action.payload.modelo };
       },
     }),
+
+    save: (solicitudId) => ({
+      type: `${base}/save`,
+      payload: { solicitudId },
+      callAPI: () =>
+        new Promise((resolve) => {
+          setTimeout(() => resolve("OK " + solicitudId), 1000);
+        }),
+      inited: (state = initialState, action) => {
+        return { ...state, isLoading: true };
+      },
+      completed: (state = initialState, action) => {
+        return { ...state, isLoading: false, result: action.response };
+      },
+      failed: (state = initialState, action) => {
+        return { ...state, isLoading: false, error: action.error };
+      },
+    }),
   };
 };
 
